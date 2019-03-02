@@ -3,7 +3,7 @@
 Highly customizable OpenAI Gym Environment with asynchronous visualisation.
 An agent learns to follow unobserved path, reward is given for advancing forward and penalty is provided for deviating from the path.
 This short [demo](https://www.youtube.com/watch?v=-EQypmIiM2E&feature=youtu.be)  shows the environment in action.
-![Colors meaning](/home/dmitry/Pictures/colors.png  "Colors meaning")
+![Colors meaning](http://farm8.staticflickr.com/7848/33376705138_0943a4e510_b.jpg  "Colors meaning")
 
 ## Features
 
