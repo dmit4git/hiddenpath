@@ -3,7 +3,7 @@
 Highly customizable OpenAI Gym Environment with asynchronous visualisation.
 An agent learns to follow unobserved path, reward is given for advancing forward and penalty is provided for deviating from the path.
 This short [demo](https://www.youtube.com/watch?v=-EQypmIiM2E&feature=youtu.be)  shows the environment in action.
-![Colors meaning](http://farm8.staticflickr.com/7848/33376705138_0943a4e510_b.jpg  "Colors meaning")
+![Colors meaning](farm8.staticflickr.com/7848/33376705138_0943a4e510_b.jpg  "Colors meaning")
 
 ## Features
 
@@ -94,6 +94,77 @@ if __name__ == '__main__':
 	env.close_renderer()  # close visualization window
 ```
 
+##### Tensorforce
+
+Second example uses [tensorforce](https://github.com/tensorforce/tensorforce)  PPO implementation (requires [tensorflow](https://www.tensorflow.org/))
+
+```
+if __name__ == '__main__':
+    from tensorforce.agents import PPOAgent
+    from tensorforce.execution import Runner
+    from tensorforce.contrib.openai_gym import OpenAIGym
+    import numpy as np
+    import hiddenpath  # registers the environment
+    env = OpenAIGym('HiddenPath-v0')
+    # configure spaces befor world loading
+    env.gym.settings['action_space'] = 'Discrete'
+    env.gym.settings['observation_space'] = 'Box'
+    env.gym.set_world('/home/dmitry/Documents/projects/hiddenpath/hiddenpath/worlds/1024x384.png')
+    # tensorforce used default spaces during OpenAIGym construction, next 2 lines set actual spaces
+    env._states = OpenAIGym.state_from_space(space=env.gym.observation_space)
+    env._actions = OpenAIGym.action_from_space(space=env.gym.action_space)
+    agent = PPOAgent(
+        states=env.states,
+        actions=env.actions,
+        network=[
+            dict(type='dense', size=32, activation='tanh'),
+            dict(type='dense', size=32, activation='tanh'),
+            dict(type='dense', size=32, activation='tanh'),
+            dict(type='dense', size=32, activation='tanh'),
+            dict(type='dense', size=32, activation='tanh'),
+            dict(type='dense', size=32, activation='tanh')
+        ],
+    )
+    r = Runner(agent=agent, environment=env)
+    def episode_finished(r):
+        print(
+            "Finished episode {ep} after {ts} timesteps (reward: {reward})".format(ep=r.episode, ts=r.episode_timestep,
+                                                                                   reward=r.episode_rewards[-1]))
+        return True
+    r.run(episodes=100001, episode_finished=episode_finished)
+    r.close()
+    env.close_renderer()
+    print("Learning finished. Total episodes: {ep}. Average reward of last 100 episodes: {ar}.".format(
+        ep=r.episode,
+        ar=np.mean(r.episode_rewards[-100:]))
+    )
+```
+
+##### OpenAI baseline
+
+Last example uses [OpenAI baselines](https://github.com/openai/baselines) implementation of Deep Q-Learner ()
+```
+if __name__ == '__main__':
+    import gym
+    from baselines import deepq
+    import hiddenpath
+    env = gym.make("HiddenPath-v0")
+    env.settings['action_space'] = 'Discrete'
+    env.settings['observation_space'] = 'Box'
+    env.set_world('/home/dmitry/Documents/projects/hiddenpath/hiddenpath/worlds/1024x384.png')
+    act = deepq.learn(
+        env,
+        network='mlp',
+        lr=1e-3,
+        total_timesteps=100000,
+        buffer_size=50000,
+        exploration_fraction=0.1,
+        exploration_final_eps=0.02,
+        print_freq=10
+    )
+    env.close_renderer()
+```
+
 ### Customization and configuration
 
 This environment is more flexible than most. Keep in mind a general rule: edit settings before loading world and load world before using the environment.
@@ -119,6 +190,9 @@ Visualization mode can be changed through 'env.settings['visualization']' entry,
 #### Action and observation spaces
 
 For better compatibility with various agents the action and observation spaces can be set as various `gym.spaces` types, action space is particularly flexible.
+
+##### Action space
+
 Action space have six settings: **space type**, **max angle** , **angle space**, **min force**, **max force**, **force space** where angle is the direction of move and force is the step size. **max angle**, **min force** and **max force** define diapasone of angle and force values that are actually available for a move; **angle space** and **force space** define available action values that are translated into move. **max angle** is set through `env.settings['max_angle']`, **angle space** is set through `env.settings['angle_space_size']`, **min force** is set through `env.settings['min_force']`,  **max force** is set through `env.settings['max_force']`, **force space** is set through `env.settings['force_space_size']`.
 
 action **space type** is set through `env.settings['action_space']` entry, valid values are:
@@ -126,6 +200,15 @@ action **space type** is set through `env.settings['action_space']` entry, valid
 - `'MultiDiscrete'` : (default) `gym.spaces.MultiDiscrete` type is used with following `nvec` for possible actions: [**angle space**, **force space**]. Those action values are evenly translated into possible angle values: [**max angle**, **max angle** * (-1)] and force values [**min force**, **max force**]. With default values (**max angle**=75 , **angle space**=3, **min force**=2, **max force**=10, **force space**=2), angle value 0 translates into 75 degrees, 1 into 0, 2 into -75; force value 0 translates into 2, 1 into 10. So action [0, 1] translates into move 75 degres to the left (up on visualization) and  step of 10 units long.
 - `'Discrete'` : `gym.spaces.Discrete` type is used. Same as `'MultiDiscrete'`. Only angle choice is required, force is always **max force**.
 - `'Box'` : `gym.spaces.Box` type is used with following shape: (low=[0, 0], high=[**angle space**, **force space**]). Real values from that diapasone are evenly translated into possible angle values: [**max angle**, **max angle** * (-1)] and force values [**min force**, **max force**].
+
+##### Observation space
+
+Observation space is simpler, it only has space type setting in `env.settings['observation_space']` entry, valid values are:
+
+- `'MultiDiscrete'` : (default) `gym.spaces.MultiDiscrete` type is used. Agent location coorditaes are rounded.
+- `'Box'` : (default) `gym.spaces.Box` type is used. Agent location coorditaes are not rounded.
+
+Visualization is consistent with either type.
  
 ## License
 
