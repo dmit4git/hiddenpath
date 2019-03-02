@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
 ##### OpenAI baseline
 
-Last example uses [OpenAI baselines](https://github.com/openai/baselines) implementation of Deep Q-Learner ()
+Last example uses [OpenAI baselines](https://github.com/openai/baselines) implementation of Deep Q-Learner (requires [tensorflow](https://www.tensorflow.org/))
 ```
 if __name__ == '__main__':
     import gym
