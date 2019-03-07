@@ -17,11 +17,8 @@ These instructions will get you a copy of the project up and running.
 
 ### Prerequisites
 
-Environment was written using python 3.6. The only dependency is pure pythonian [pyglet](https://bitbucket.org/pyglet/pyglet/wiki/Home) .
-
-```
-pip3 install pyglet
-```
+Environment was written using python 3.6. The only dependency (aside from gym) is pure pythonian [pyglet](https://bitbucket.org/pyglet/pyglet/wiki/Home) .
+Dependencies get installed automatically.
 
 ### Installing
 
@@ -41,7 +38,7 @@ pip3 install -e .
 ### Environment mechanics
 
 The essential goal of a learner in RL concept is to approximate an optimal (in terms of total reward) function that maps observations to actions, this environment is somewhat intuitive illustration to that principle. Agent approximates path that can be easily made by a user.
-The environment is a 2D world with path unobservable to the agent. At every episode the agent starts in the midle of the left border. At every step the environment provides the agent with coordinates of its current location, the agent choses direction where to move and size of the step. Agents goal is to travel from left to right following the path as close as possible. The environment rewards the agent for advancing forward (horizontally to the right on visualization) and punishes for deviating from the path.
+The environment is a 2D world with path unobservable to the agent. At every episode the agent starts in the middle of the left border. At every step the environment provides the agent with coordinates of its current location, the agent choses direction where to move and size of the step. Agents goal is to travel from left to right following the path as close as possible. The environment rewards the agent for advancing forward (horizontally to the right on visualization) and punishes for deviating from the path.
 
 #### Reward
 
@@ -177,7 +174,7 @@ A world can be loaded from image using method `set_world(file, pixel_format='RGB
 - **pixel_format** is order of color components in the image, png default is 'RGBA'
 - **is_path** is method that determines if a pixel is a path pixel. If no method is given, default criteria is used - path pixels are those which have maximum (255) green color component `is_path = lambda: self.pixel['Green'] == 255`. Any custom method can be used, you can check pixel color components using `env.pixel[component]` entry where `component` is a string key from following set: `'Red', 'Green', 'Blue', 'Alpha', 'Luminance', 'Intensity'`, after analysing a pixel return `True` if it's a path pixel.
 
-Alternitevly, world can be loaded from saved file with `load_path(file)`, it's faster and does not require pyglet. To save world after loading from image, use `save_path(file)` method. The package includes a png image of a world and its saved to ppe file counterpart in hiddenpath/worlds directory.
+Alternately, world can be loaded from saved file with `load_path(file)`, it's faster and does not require pyglet. To save world after loading from image, use `save_path(file)` method. The package includes a png image of a world and its saved to ppe file counterpart in hiddenpath/worlds directory.
 
 #### Visualization
 
@@ -189,7 +186,7 @@ Visualization mode can be changed through 'env.settings['visualization']' entry,
 
 #### Action and observation spaces
 
-For better compatibility with various agents the action and observation spaces can be set as various `gym.spaces` types, action space is particularly flexible.
+For better compatibility with various agents the action and observation spaces can be set as various `gym.spaces` types. Action space is made particularly flexible to make search space customizeable.
 
 ##### Action space
 
@@ -206,7 +203,7 @@ action **space type** is set through `env.settings['action_space']` entry, valid
 Observation space is simpler, it only has space type setting in `env.settings['observation_space']` entry, valid values are:
 
 - `'MultiDiscrete'` : (default) `gym.spaces.MultiDiscrete` type is used. Agent location coorditaes are rounded.
-- `'Box'` : (default) `gym.spaces.Box` type is used. Agent location coorditaes are not rounded.
+- `'Box'` : (default) `gym.spaces.Box` type is used. Agent location coordinates are not rounded.
 
 Visualization is consistent with either type.
  
