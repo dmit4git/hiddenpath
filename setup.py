@@ -8,4 +8,7 @@ setup(name='hiddenpath',
       author_email='box4dmitry@gmail.com',
       license='MIT',
       packages=['hiddenpath'],
+      install_requires=[
+          'gym', 'pyglet',
+      ],
       zip_safe=False)
